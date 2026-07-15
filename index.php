@@ -47,10 +47,10 @@ $totalStock = array_sum(LAUNCH_STOCK);
     <h2 class="font-display text-3xl font-bold">How to order</h2>
     <?php
     $steps = [
-        ['Pick your tubs'],
-        ['Pick a delivery date and time'],
-        ['Delivery or pickup'],
-        ['Pay your way',],
+        ['Pick your tubs', ''],
+        ['Pick a delivery date and time', ''],
+        ['Delivery or pickup', ''],
+        ['Pay your way', ''],
     ];
     // The grid follows however many steps there are — add or remove one above and the layout still fills.
     $stepCols = [
