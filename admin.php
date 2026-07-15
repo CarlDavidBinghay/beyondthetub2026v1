@@ -1,4 +1,10 @@
 <?php
+// Add ?debug=1 to the admin URL to see errors on screen instead of a white page.
+if (isset($_GET['debug'])) {
+    ini_set('display_errors', '1');
+    ini_set('display_startup_errors', '1');
+    error_reporting(E_ALL);
+}
 require_once __DIR__ . '/includes/functions.php';
 
 $code   = $_GET['code'] ?? $_POST['code'] ?? '';
@@ -87,11 +93,9 @@ if ($authed && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (($_POST['do'] ?? '') === 'test_email') {
-        $mailer = __DIR__ . '/mailer.php';
-        if (!is_file($mailer)) {
-            $mailer = __DIR__ . '/includes/mailer.php';
+        if (is_file(__DIR__ . '/includes/mailer.php')) {
+            require_once __DIR__ . '/includes/mailer.php';
         }
-        require_once $mailer;
         @set_time_limit(20);   // give the socket room; the mailer itself times out at 6s
         $recipients = (array)(NOTIFY['email_to'] ?? []);
         if (!NOTIFY['gmail_user'] || !NOTIFY['gmail_app_password']) {

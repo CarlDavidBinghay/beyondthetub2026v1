@@ -9,9 +9,9 @@ date_default_timezone_set('Asia/Manila');
 const SHOP = [
     'name'      => 'Beyond The Tub',
     'tagline'   => 'Small-batch tubs, made in Cebu.',
-    'instagram' => 'beyondthetub',
+    'instagram' => 'beyondthetubofficial',
     'ig_url'    => 'https://instagram.com/beyondthetubofficial',
-    'email'     => 'hello@beyondthetub.ph',
+    'email'     => 'beyondthetubofficial@gmail.com',
     'currency'  => '₱',
     'timezone'  => 'Asia/Manila',
     'city'      => 'Cebu',
@@ -54,7 +54,7 @@ const DELIVERY_METHODS = [
         'fee'   => 0,
         'needs_address'  => false,
         'send_location'  => true,   // admin messages them the pin
-        'note'  => 'We message you the exact location once your order is confirmed.',
+        'note'  => 'We will message you the exact location once your order is confirmed.',
     ],
     'rider' => [
         'label' => 'Delivery — our rider',
@@ -70,7 +70,7 @@ const DELIVERY_METHODS = [
         'fee'   => 0,
         'needs_address'  => false,  // they send their own rider to us
         'send_location'  => true,   // so they need our location too
-        'note'  => 'Book Maxim or Grab. We message you the pickup location for your rider, and you pay the rider directly.',
+        'note'  => 'Book Maxim or Grab. We will message you the pickup location for your rider, and you pay the rider directly.',
     ],
 ];
 

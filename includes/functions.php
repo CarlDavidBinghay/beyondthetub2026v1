@@ -7,6 +7,17 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+/**
+ * Make sure the storage folders exist on every request.
+ * On Railway a mounted volume starts empty and hides whatever came from the repo,
+ * so orders/ and proofs/ must be (re)created here or saving fails silently.
+ */
+foreach ([STORAGE_DIR, PROOF_DIR] as $dir) {
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0775, true);
+    }
+}
+
 /* ----------------------------------------------------------------- output */
 
 function e(?string $v): string

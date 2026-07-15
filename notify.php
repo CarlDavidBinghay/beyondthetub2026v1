@@ -43,7 +43,11 @@ function notify_new_order(array $order): void
 
     $recipients = (array)(NOTIFY['email_to'] ?? []);
     if (NOTIFY['gmail_user'] && NOTIFY['gmail_app_password'] && $recipients) {
-        require_once __DIR__ . '/mailer.php';
+        if (is_file(__DIR__ . '/mailer.php')) {
+            require_once __DIR__ . '/mailer.php';
+        } else {
+            return; // no mailer file, nothing to send
+        }
         try {
             send_gmail(
                 NOTIFY['gmail_user'],

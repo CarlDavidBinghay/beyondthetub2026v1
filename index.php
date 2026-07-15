@@ -11,17 +11,17 @@ $totalStock = array_sum(LAUNCH_STOCK);
   <div class="mx-auto grid max-w-6xl items-center gap-10 px-5 py-14 md:grid-cols-[1.05fr_.95fr] md:py-20">
     <div>
       <p class="flex flex-wrap items-center gap-2 font-mono text-xs uppercase tracking-[0.18em] text-cocoa">
-        <span class="rounded-full border-2 border-green bg-greenlt px-3 py-1 text-green">Launch batch</span>
-        <span><?= e(SHOP['city']) ?> only · <?= $totalLeft ?> of <?= $totalStock ?> tubs left</span>
+        <span class="rounded-full border-2 border-green bg-greenlt px-3 py-1 text-green">Based in Cebu City</span>
+        
       </p>
 
       <h1 class="mt-5 font-display text-5xl font-bold leading-[0.95] tracking-tight md:text-6xl">
-        Two flavours.<br>Eighty tubs.<br>
-        <span class="text-green">That’s the whole batch.</span>
+        One Tub.<br>
+        <span class="text-green">Endless Indulgence.</span>
       </h1>
 
       <p class="mt-6 max-w-md text-lg leading-relaxed text-cocoa">
-        Biscoff and Classic, in 8oz and 12oz. Everything is cooked fresh on the production date you pick — nothing sits in a freezer waiting for an order.
+        Every tub is freshly made to order to ensure the freshest and most delicious pudding experience.
       </p>
 
       <div class="mt-8 flex flex-wrap items-center gap-3">
@@ -29,9 +29,7 @@ $totalStock = array_sum(LAUNCH_STOCK);
         <a href="#how" class="rounded-full border-2 border-ink px-7 py-3.5 font-semibold hover:bg-greenlt">How it works</a>
       </div>
 
-      <p class="mt-5 font-mono text-xs text-cocoa">
-        Pickup free · Rider delivery <?= money(DELIVERY_METHODS['rider']['fee']) ?> around Cebu · GCash or cash on delivery
-      </p>
+      
     </div>
 
     <div class="relative mx-auto w-full max-w-sm">
@@ -49,10 +47,10 @@ $totalStock = array_sum(LAUNCH_STOCK);
     <h2 class="font-display text-3xl font-bold">How to order</h2>
     <?php
     $steps = [
-        ['Pick your tubs', 'Biscoff or Classic, 8oz or 12oz. The counter on each size is the real stock — when it hits zero, that size is gone.'],
-        ['Pick a production date', 'These are the days we actually cook. Your tubs are made that day, not before.'],
-        ['Delivery or pickup', 'Delivery asks for your address and a few details for the rider. Pickup is free — we send the pin.'],
-        ['Pay your way', 'Scan our QR and send the reference plus a screenshot, or just choose cash on delivery.'],
+        ['Pick your tubs'],
+        ['Pick a delivery date and time'],
+        ['Delivery or pickup'],
+        ['Pay your way',],
     ];
     // The grid follows however many steps there are — add or remove one above and the layout still fills.
     $stepCols = [
@@ -87,8 +85,7 @@ $totalStock = array_sum(LAUNCH_STOCK);
 
       <!-- Pre-order window: when you can order -->
       <div class="rounded-3xl border-2 border-ink bg-cream p-6 md:p-8">
-        <p class="font-mono text-xs uppercase tracking-widest text-cocoa">When you can order</p>
-        <h2 class="mt-1 font-display text-2xl font-bold">Pre-order dates</h2>
+        <h2 class="mt-1 font-display text-2xl font-bold">Pre-order for this week's batch</h2>
 
         <?php if (!$preorderDates): ?>
           <p class="mt-4 rounded-2xl border-2 border-dashed border-line bg-white px-5 py-6 text-center text-sm text-cocoa">
@@ -100,7 +97,7 @@ $totalStock = array_sum(LAUNCH_STOCK);
           <p class="mt-1 text-sm text-cocoa">
             <?= preorder_open_today()
                 ? 'Ordering is open today. Get your tubs in before the batch fills.'
-                : 'These are the days we take orders.' ?>
+                : '' ?>
           </p>
           <div class="mt-4 flex flex-wrap gap-2">
             <?php foreach ($preorderDates as $d): ?>
@@ -115,7 +112,6 @@ $totalStock = array_sum(LAUNCH_STOCK);
 
       <!-- Delivery dates: when you get it -->
       <div class="rounded-3xl border-2 border-ink bg-cream p-6 md:p-8">
-        <p class="font-mono text-xs uppercase tracking-widest text-cocoa">When you get your tubs</p>
         <h2 class="mt-1 font-display text-2xl font-bold">Delivery dates</h2>
 
         <?php if (!$deliveryDates): ?>
@@ -139,9 +135,6 @@ $totalStock = array_sum(LAUNCH_STOCK);
               </div>
             <?php endforeach; ?>
           </div>
-          <p class="mt-3 font-mono text-[11px] text-cocoa">
-            Each 30-minute window takes <?= SLOT_CAPACITY ?> orders.
-          </p>
         <?php endif; ?>
       </div>
     </div>
@@ -159,10 +152,9 @@ $totalStock = array_sum(LAUNCH_STOCK);
   <div class="flex flex-wrap items-end justify-between gap-4">
     <div>
       <h2 class="font-display text-4xl font-bold">The menu</h2>
-      <p class="mt-2 text-cocoa">Two flavours for the launch. Twenty tubs of each size — that is all there is.</p>
     </div>
     <a href="<?= e(GOOGLE_FORM_URL) ?>" target="_blank" rel="noopener"
-       class="font-mono text-xs uppercase tracking-widest text-green underline underline-offset-4">Prefer the Google Form?</a>
+       class="font-mono text-xs uppercase tracking-widest text-green underline underline-offset-4"></a>
   </div>
 
   <div class="mt-8 grid gap-6 md:grid-cols-2">
