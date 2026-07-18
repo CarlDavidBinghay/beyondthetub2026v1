@@ -2,7 +2,7 @@
 <footer class="mt-24 border-t-2 border-ink">
   <div class="mx-auto grid max-w-6xl gap-8 px-5 py-12 text-center md:grid-cols-3">
     <div class="flex flex-col items-center">
-      <img src="<?= e(ASSETS['logo']) ?>" alt="<?= e(SHOP['name']) ?>" class="h-16 w-auto">
+      <img src="<?= e(ASSETS['logo']) ?>" alt="<?= e(SHOP['name']) ?>" class="logo-walk h-16 w-auto">
       <p class="mt-4 max-w-xs text-sm text-cocoa">Freshly made in every batch, layered with quality ingredients, and prepared with care for the best taste in every spoonful.</p>
     </div>
     <div class="text-sm">
