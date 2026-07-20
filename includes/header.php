@@ -7,6 +7,12 @@ $pageTitle = $pageTitle ?? SHOP['name'];
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<?php
+// Resolve the folder this app lives in, so images, scripts and fetch() calls
+// keep working even if the browser reached us via an odd URL.
+$basePath = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/')), '/') . '/';
+?>
+<base href="<?= e($basePath) ?>">
 <title><?= e($pageTitle) ?> — <?= e(SHOP['tagline']) ?></title>
 <meta name="description" content="Beyond The Tub — small-batch Biscoff and Classic tubs, made fresh in Cebu. Delivery around Cebu or free pickup.">
 <link rel="icon" href="<?= e(ASSETS['logo']) ?>">
