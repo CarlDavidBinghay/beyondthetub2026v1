@@ -127,10 +127,7 @@ $totalStock = array_sum(LAUNCH_STOCK);
               <div class="rounded-2xl border-2 <?= $full ? 'border-line bg-white opacity-50' : 'border-ink bg-white' ?> px-2 py-3 text-center">
                 <p class="font-mono text-[10px] uppercase tracking-widest text-cocoa"><?= e($d['weekday']) ?></p>
                 <p class="font-display text-2xl font-bold leading-tight"><?= e($d['day']) ?></p>
-                <p class="font-mono text-[10px] uppercase tracking-widest text-cocoa"><?= e($d['month']) ?></p>
-                <p class="mt-1 font-mono text-[10px] <?= $full ? 'text-jam' : 'text-cocoa' ?>">
-                  <?= $full ? 'full' : $left . ' left' ?>
-                </p>
+                <p class="font-mono text-[10px] uppercase tracking-widest <?= $full ? 'text-jam' : 'text-cocoa' ?>"><?= $full ? 'full' : e($d['month']) ?></p>
               </div>
             <?php endforeach; ?>
           </div>
@@ -218,7 +215,6 @@ $totalStock = array_sum(LAUNCH_STOCK);
         We deliver around <?= e(implode(', ', array_slice(SERVICE_AREAS, 0, 4))) ?> and the rest of Cebu through your own booked rider.
         Pickup is free and always the fastest option.
       </p>
-      <p class="mt-3 font-mono text-sm text-cocoa"><?= $totalLeft ?> tubs left of <?= $totalStock ?>.</p>
       <a href="#menu" class="mt-5 self-start rounded-full border-2 border-ink bg-green px-6 py-3 font-semibold text-white hover:bg-greendk">Order before it goes</a>
     </div>
   </div>
