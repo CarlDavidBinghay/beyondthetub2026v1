@@ -184,17 +184,18 @@ $_SESSION['last_order'] = $reference;
 // Answer the customer NOW — their order is saved, so confirm it instantly.
 // Anything slow (email, Google Form) happens after, where it cannot stall checkout.
 $payload = json_encode(['reference' => $reference, 'redirect' => 'confirmation.php?ref=' . $reference]);
-echo $payload;
 
-// Flush the response so the browser redirects immediately, then keep working.
 if (function_exists('fastcgi_finish_request')) {
+    echo $payload;
     session_write_close();
     fastcgi_finish_request();
 } else {
-    // Apache/mod_php: close the connection by declaring the length, then flush.
+    // Apache/mod_php: the headers that close the connection MUST go out before
+    // any output — set them first, then send the body and flush.
     ignore_user_abort(true);
     header('Connection: close');
     header('Content-Length: ' . strlen($payload));
+    echo $payload;
     while (ob_get_level() > 0) {
         ob_end_flush();
     }
