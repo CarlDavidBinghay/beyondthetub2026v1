@@ -122,7 +122,7 @@ const LAUNCH_STOCK = [
 /** Packaging the customer picks at checkout. First one is the default. */
 const PACKAGING = [
     'plastic' => ['label' => 'Plastic bag', 'note' => 'Simple and free.',                         'fee' => 0],
-    'thermal' => ['label' => 'Thermal bag', 'note' => 'Keep your order chilled during transport.', 'fee' => 30],
+    'thermal' => ['label' => 'Thermal bag', 'note' => 'Keeps it cold longer. Fits up to 2 tubs.', 'fee' => 30],
 ];
 
 const PAYMENT_METHODS = [
@@ -194,11 +194,13 @@ const GOOGLE_FORM_SYNC = [
  */
 const NOTIFY = [
     // Gmail — the order alert to your inbox
+    // ⚠️  Railway blocks outbound SMTP (ports 25/465/587) on trial and hobby plans,
+    //     so this cannot connect and every order waits ~15s for it to time out.
+    //     Left empty on purpose: no recipients means no send attempt, no delay.
+    //     Watch admin.php instead — it beeps and pops a notification on new orders.
     'gmail_user'         => 'beyondthetubofficial@gmail.com',
-    'gmail_app_password' => 'cbepckiijhftothq',  // 16-letter App Password (revoke anytime at myaccount.google.com/apppasswords)
-    'email_to'           => [
-        'beyondthetubofficial@gmail.com',  // alerts go here; add more addresses if you like
-    ],
+    'gmail_app_password' => 'cbepckiijhftothq',
+    'email_to'           => [],
 
     // Telegram — optional phone push
     'telegram_token'   => '',              // from @BotFather
