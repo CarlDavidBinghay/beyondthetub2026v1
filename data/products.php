@@ -13,8 +13,8 @@ const PRODUCTS = [
         'badge'     => 'Launch flavour',
         'blurb'     => 'Layers of Biscoff spread and crushed cookie through cold, slow-cooked cream.',
         'details'   => 'The biscuit goes in three times — crushed at the base, spread through the middle, and a hard layer of rubble on top that stays crunchy until you open the lid. Sweet, but it knows when to stop.',
-        'allergens' => 'Wheat, dairy, egg, soy',
-        'keeps'     => '4 days chilled. Do not freeze.',
+        'allergens' => 'Homemade Pudding, Banana, Biscoff Spread, Biscoff Cookie',
+        'keeps'     => 'Keep refrigerated (do not freeze) and enjoy within 2–3 days for the best freshness, taste, and texture.',
         'sizes'     => [
             ['label' => '8oz tub',  'serves' => 'One person, one sitting', 'price' => 159],
             ['label' => '12oz tub', 'serves' => 'Share between two',       'price' => 219],
@@ -28,7 +28,7 @@ const PRODUCTS = [
         'blurb'     => 'The one we started with. Vanilla cream, ripe banana, soft biscuit layers.',
         'details'   => 'Made the same way it was made for friends before anyone was paying: cream cooked low, bananas sliced in that morning, biscuit left to soften overnight so the whole tub eats like one thing instead of layers.',
         'allergens' => 'Wheat, dairy, egg, soy',
-        'keeps'     => '4 days chilled. Do not freeze.',
+        'keeps'     => 'Keep refrigerated (do not freeze) and enjoy within 2–3 days for the best freshness, taste, and texture.',
         'sizes'     => [
             ['label' => '8oz tub',  'serves' => 'One person, one sitting', 'price' => 129],
             ['label' => '12oz tub', 'serves' => 'Share between two',       'price' => 179],
@@ -37,10 +37,6 @@ const PRODUCTS = [
 ];
 
 const FAQS = [
-    [
-        'q' => 'How many tubs are there?',
-        'a' => 'Twenty of each size, per flavour, for this launch — eighty tubs in total. When the counter on a size hits zero, that size is gone until the next batch. Nothing is held back.',
-    ],
     [
         'q' => 'Where do you deliver?',
         'a' => 'Cebu only for now. Our rider covers Cebu City, Mandaue, Lapu-Lapu and Talisay for a flat fee. Anywhere else in Cebu, book a Lalamove or Grab and we will hand your order to the rider.',
@@ -59,10 +55,10 @@ const FAQS = [
     ],
     [
         'q' => 'How long does a tub keep?',
-        'a' => 'Four days in the fridge with the lid on. Do not freeze it — the cream splits when it thaws and there is no saving it.',
+        'a' => 'Keep refrigerated (do not freeze) and enjoy within 2–3 days for the best freshness, taste, and texture.',
     ],
     [
-        'q' => 'Any allergens?',
-        'a' => 'Both flavours contain wheat, dairy, egg and soy, and they are made in one small kitchen with shared equipment. If your allergy is serious, message us before ordering.',
+        'q' => 'Any allergies?',
+        'a' => 'please review the ingredient list provided for each pudding before consuming.',
     ],
 ];
