@@ -35,7 +35,7 @@ const PRODUCTS = [
 const FAQS = [
     [
         'q' => 'Where do you deliver?',
-        'a' => 'Cebu only for now. We deliver within Cebu City, Mandaue, Lapu-Lapu, and Talisay. Delivery fees vary depending on your location.,
+        'a' => 'Cebu only for now. We deliver within Cebu City, Mandaue, Lapu-Lapu, and Talisay. Delivery fees vary depending on your location.',
     ],
     [
         'q' => 'Can I pick it up instead?',
@@ -51,6 +51,6 @@ const FAQS = [
     ],
     [
         'q' => 'Any allergies?',
-        'a' => 'please review the ingredient list provided for each pudding before consuming.',
+        'a' => 'Please review the ingredient list provided for each pudding before consuming.',
     ],
 ];
