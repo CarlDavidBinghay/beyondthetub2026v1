@@ -13,6 +13,23 @@ $pageTitle = $pageTitle ?? SHOP['name'];
 $basePath = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/')), '/') . '/';
 ?>
 <base href="<?= e($basePath) ?>">
+<?php if (!empty($isAdminApp)): ?>
+  <!-- Installable app — admin only. Customer pages stay a normal website. -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1f7a45">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="BTT Kitchen">
+  <link rel="apple-touch-icon" href="assets/brand/app-icon-192.png">
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+  </script>
+<?php endif; ?>
 <title><?= e($pageTitle) ?> — <?= e(SHOP['tagline']) ?></title>
 <meta name="description" content="Beyond The Tub — small-batch Biscoff and Classic tubs, made fresh in Cebu. Delivery around Cebu or free pickup.">
 <link rel="icon" href="<?= e(ASSETS['logo']) ?>">

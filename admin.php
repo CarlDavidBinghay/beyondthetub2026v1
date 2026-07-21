@@ -144,6 +144,27 @@ if ($authed && $_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
+    if (($_POST['do'] ?? '') === 'delete_archived') {
+        $ref    = (string)($_POST['ref'] ?? '');
+        $folder = (string)($_POST['folder'] ?? '');
+        $ok     = delete_archived_order($folder, $ref);
+        $_SESSION['flash'] = $ok
+            ? ['good', $ref . ' deleted for good.']
+            : ['bad', 'Could not delete ' . $ref . '.'];
+        header('Location: admin.php?code=' . urlencode(ADMIN_CODE) . '&archive=' . urlencode($folder));
+        exit;
+    }
+
+    if (($_POST['do'] ?? '') === 'delete_folder') {
+        $folder = (string)($_POST['folder'] ?? '');
+        $ok     = delete_archive_folder($folder);
+        $_SESSION['flash'] = $ok
+            ? ['good', 'Deleted the whole ' . pretty_date($folder) . ' folder.']
+            : ['bad', 'Could not delete that folder.'];
+        header('Location: admin.php?code=' . urlencode(ADMIN_CODE));
+        exit;
+    }
+
     if (($_POST['do'] ?? '') === 'stock') {
         $stock = [];
         foreach (LAUNCH_STOCK as $key => $_) {
@@ -157,6 +178,7 @@ if ($authed && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $pageTitle = 'Kitchen';
+$isAdminApp = true;   // header.php uses this to emit the app manifest — admin only
 require __DIR__ . '/includes/header.php';
 
 $orders = $authed ? all_orders() : [];
@@ -321,10 +343,24 @@ $dates  = $authed ? production_dates() : [];
             · <a href="" class="text-green underline underline-offset-4">refresh to see it</a>`;
 
           if ('Notification' in window && Notification.permission === 'granted') {
-            new Notification('New order — ' + data.latest.total, {
+            const title = 'New order — ' + data.latest.total;
+            const opts = {
               body: data.latest.name + ' · ' + data.latest.reference,
-              icon: <?= json_encode(ASSETS['logo']) ?>,
-            });
+              icon: 'assets/brand/app-icon-192.png',
+              badge: 'assets/brand/app-icon-192.png',
+              tag: 'btt-order-' + data.latest.reference,
+              requireInteraction: true,   // stays on screen until you deal with it
+              vibrate: [200, 100, 200],
+            };
+            // Through the service worker when installed: the notification survives,
+            // and tapping it brings the kitchen to the front.
+            if (navigator.serviceWorker && navigator.serviceWorker.ready) {
+              navigator.serviceWorker.ready
+                .then((reg) => reg.showNotification(title, opts))
+                .catch(() => new Notification(title, opts));
+            } else {
+              new Notification(title, opts);
+            }
           }
         } else if (unseen === 0) {
           text.textContent = `Watching for new orders… ${data.stock_left} tubs left.`;
@@ -559,7 +595,10 @@ $dates  = $authed ? production_dates() : [];
   <?php if ($dates): $counts = slot_counts(); ?>
     <section class="mt-8 rounded-3xl border-2 border-ink bg-white p-6">
       <h2 class="font-display text-2xl font-bold">Windows</h2>
-      
+      <p class="mt-1 text-sm text-cocoa">
+        Each 30-minute window takes <?= SLOT_CAPACITY ?> orders per date. When one fills, customers can no longer pick it.
+        Change the number in <span class="font-mono">config.php → SLOT_CAPACITY</span>.
+      </p>
 
       <div class="mt-5 space-y-5">
         <?php foreach ($dates as $d):
@@ -601,7 +640,9 @@ $dates  = $authed ? production_dates() : [];
     <div class="flex flex-wrap items-start justify-between gap-3">
       <div>
         <h2 class="font-display text-2xl font-bold">Email alerts</h2>
-
+        <p class="mt-1 max-w-lg text-sm text-cocoa">
+          When an order comes in, the shop emails everyone on the list. Set this up in <span class="font-mono">config.php → NOTIFY</span>.
+        </p>
       </div>
       <span class="rounded-full border-2 border-ink px-3 py-1 font-mono text-[11px] uppercase tracking-widest <?= $emailReady ? 'bg-greenlt' : 'bg-gold/40' ?>">
         <?= $emailReady ? 'configured' : 'not set up' ?>
@@ -756,7 +797,17 @@ $dates  = $authed ? production_dates() : [];
         <div id="archive" class="mt-5 rounded-3xl border-2 border-ink bg-white p-5">
           <div class="flex flex-wrap items-baseline justify-between gap-2">
             <h3 class="font-display text-xl font-bold"><?= e(pretty_date($openFolder)) ?></h3>
-            <p class="font-mono text-xs text-cocoa">storage/archive/<?= e($openFolder) ?>/</p>
+            <div class="flex items-center gap-3">
+              <p class="font-mono text-xs text-cocoa">storage/archive/<?= e($openFolder) ?>/</p>
+              <form method="post"
+                    onsubmit="return confirm('Delete the entire <?= e(pretty_date($openFolder)) ?> folder and all <?= count($folderItems) ?> order(s) in it? This cannot be undone.');">
+                <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+                <input type="hidden" name="code" value="<?= e(ADMIN_CODE) ?>">
+                <input type="hidden" name="do" value="delete_folder">
+                <input type="hidden" name="folder" value="<?= e($openFolder) ?>">
+                <button class="rounded-full border-2 border-jam px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-jam hover:bg-jam hover:text-white">Delete folder</button>
+              </form>
+            </div>
           </div>
 
           <div class="mt-4 space-y-3">
@@ -787,14 +838,27 @@ $dates  = $authed ? production_dates() : [];
                     </a>
                   <?php endif; ?>
 
-                  <form method="post" class="mt-3">
-                    <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
-                    <input type="hidden" name="code" value="<?= e(ADMIN_CODE) ?>">
-                    <input type="hidden" name="do" value="unarchive">
-                    <input type="hidden" name="ref" value="<?= e($o['reference']) ?>">
-                    <input type="hidden" name="folder" value="<?= e($openFolder) ?>">
-                    <button class="rounded-full border-2 border-ink px-4 py-1.5 text-xs font-semibold hover:bg-greenlt">Put back in orders</button>
-                  </form>
+                  <div class="mt-3 flex flex-wrap items-center gap-2">
+                    <form method="post">
+                      <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+                      <input type="hidden" name="code" value="<?= e(ADMIN_CODE) ?>">
+                      <input type="hidden" name="do" value="unarchive">
+                      <input type="hidden" name="ref" value="<?= e($o['reference']) ?>">
+                      <input type="hidden" name="folder" value="<?= e($openFolder) ?>">
+                      <button class="rounded-full border-2 border-ink px-4 py-1.5 text-xs font-semibold hover:bg-greenlt">Put back in orders</button>
+                    </form>
+
+                    <form method="post"
+                          onsubmit="return confirm('Delete <?= e($o['reference']) ?> permanently? This cannot be undone.');">
+                      <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+                      <input type="hidden" name="code" value="<?= e(ADMIN_CODE) ?>">
+                      <input type="hidden" name="do" value="delete_archived">
+                      <input type="hidden" name="ref" value="<?= e($o['reference']) ?>">
+                      <input type="hidden" name="folder" value="<?= e($openFolder) ?>">
+                      <button aria-label="Delete <?= e($o['reference']) ?> permanently"
+                              class="grid h-8 w-8 place-items-center rounded-full border-2 border-jam text-sm font-semibold text-jam hover:bg-jam hover:text-white">✕</button>
+                    </form>
+                  </div>
                 </div>
               </details>
             <?php endforeach; ?>

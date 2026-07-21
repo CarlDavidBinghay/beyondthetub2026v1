@@ -1,0 +1,25 @@
+{
+  "name": "Beyond The Tub — Kitchen",
+  "short_name": "BTT Kitchen",
+  "description": "Order desk for Beyond The Tub. Watch new orders, manage stock, dates and the archive.",
+  "start_url": "admin.php",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f4f3e7",
+  "theme_color": "#1f7a45",
+  "icons": [
+    {
+      "src": "assets/brand/app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/brand/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

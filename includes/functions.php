@@ -659,6 +659,42 @@ function archived_orders(string $folder): array
     return $orders;
 }
 
+/** Delete one archived order for good. */
+function delete_archived_order(string $folder, string $reference): bool
+{
+    if (!preg_match('/^BTT-[A-F0-9]{6}$/', $reference) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $folder)) {
+        return false;
+    }
+    $path = ARCHIVE_DIR . '/' . $folder . '/' . $reference . '.json';
+    if (!is_file($path)) {
+        return false;
+    }
+    $ok = @unlink($path);
+
+    // Tidy up: an empty folder is just clutter.
+    $dir = ARCHIVE_DIR . '/' . $folder;
+    if ($ok && is_dir($dir) && !glob($dir . '/BTT-*.json')) {
+        @rmdir($dir);
+    }
+    return $ok;
+}
+
+/** Delete a whole archive folder and everything in it. */
+function delete_archive_folder(string $folder): bool
+{
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $folder)) {
+        return false;
+    }
+    $dir = ARCHIVE_DIR . '/' . $folder;
+    if (!is_dir($dir)) {
+        return false;
+    }
+    foreach (glob($dir . '/*') ?: [] as $file) {
+        @unlink($file);
+    }
+    return @rmdir($dir);
+}
+
 /** Change a few fields on a saved order — used when admin marks the location as sent. */
 function update_order(string $reference, array $changes): bool
 {
