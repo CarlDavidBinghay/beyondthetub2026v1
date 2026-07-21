@@ -1,8 +1,11 @@
 <?php
 /**
  * The menu. Two flavours for launch, two sizes each.
- * PRICES ARE PLACEHOLDERS — set your real ones here.
- * The order of sizes matters: index 0 = 8oz, index 1 = 12oz. Stock in config.php uses those indexes.
+ * The order of sizes matters: index 0 = 8oz, index 1 = 12oz.
+ * Stock in config.php uses those indexes.
+ *
+ * ⚠️  Every value ends with a quote THEN a comma:  'text',
+ *     A missing quote is what causes "unexpected identifier" errors.
  */
 
 const PRODUCTS = [
@@ -27,7 +30,7 @@ const PRODUCTS = [
         'badge'     => 'The original',
         'blurb'     => '',
         'details'   => '',
-        'allergens' => 'Homemade Pudding, Banana, Eggnog,
+        'allergens' => 'Homemade Pudding, Banana, Eggnog',
         'keeps'     => 'Keep refrigerated (do not freeze) and enjoy within 2–3 days for the best freshness, taste, and texture.',
         'sizes'     => [
             ['label' => '8oz tub',  'serves' => 'One person, one sitting', 'price' => 129],
