@@ -418,10 +418,22 @@ function is_time_slot(string $slot): bool
 function slot_counts(): array
 {
     $counts = [];
+
     foreach (all_orders() as $o) {
         $key = ($o['schedule']['date'] ?? '') . '|' . ($o['schedule']['slot'] ?? '');
         $counts[$key] = ($counts[$key] ?? 0) + 1;
     }
+
+    // Archived orders still used up their window. Marking one done means it is
+    // handled — not that the slot is free again — otherwise you would oversell
+    // a date you have already filled.
+    foreach (production_dates() as $d) {
+        foreach (archived_orders($d['value']) as $o) {
+            $key = ($o['schedule']['date'] ?? '') . '|' . ($o['schedule']['slot'] ?? '');
+            $counts[$key] = ($counts[$key] ?? 0) + 1;
+        }
+    }
+
     return $counts;
 }
 
