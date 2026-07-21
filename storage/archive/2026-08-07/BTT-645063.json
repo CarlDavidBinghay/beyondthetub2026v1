@@ -1,0 +1,60 @@
+{
+    "reference": "BTT-645063",
+    "placed_at": "2026-07-16T00:18:22+08:00",
+    "status": "confirmed_cod",
+    "schedule": {
+        "date": "2026-08-07",
+        "date_label": "Friday, 7 August 2026",
+        "slot": "9:00 AM – 9:30 AM"
+    },
+    "customer": {
+        "name": "HAJSDHJABDS",
+        "phone": "09102838127",
+        "email": "",
+        "referral": "Instagram",
+        "referred_by": ""
+    },
+    "delivery": {
+        "method": "pickup",
+        "label": "Pick up",
+        "fee": 0,
+        "quote_later": false,
+        "address": "",
+        "city": "",
+        "landmark": "",
+        "recipient": "HAJSDHJABDS",
+        "recipient_phone": "09102838127",
+        "maps_link": "",
+        "notes": "",
+        "is_pickup": true,
+        "needs_location": true,
+        "location_sent": true
+    },
+    "payment": {
+        "method": "cod",
+        "label": "Cash on delivery \/ on pickup",
+        "reference": "",
+        "proof": ""
+    },
+    "items": [
+        {
+            "name": "Classic",
+            "variant": "12oz tub",
+            "qty": 1,
+            "price": 240,
+            "line": 240
+        }
+    ],
+    "totals": {
+        "subtotal": 240,
+        "delivery": 0,
+        "packaging": 30,
+        "total": 270
+    },
+    "packaging": {
+        "key": "thermal",
+        "label": "Thermal bag",
+        "fee": 30
+    },
+    "archived_at": "2026-07-21T08:45:05+08:00"
+}

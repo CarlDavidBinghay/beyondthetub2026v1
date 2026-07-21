@@ -123,6 +123,27 @@ if ($authed && $_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
+    if (($_POST['do'] ?? '') === 'archive') {
+        $ref    = (string)($_POST['ref'] ?? '');
+        $folder = archive_order($ref);
+        $_SESSION['flash'] = $folder
+            ? ['good', $ref . ' marked done and filed under ' . pretty_date($folder) . '.']
+            : ['bad', 'Could not archive ' . $ref . '. Check that storage/archive is writable.'];
+        header('Location: admin.php?code=' . urlencode(ADMIN_CODE));
+        exit;
+    }
+
+    if (($_POST['do'] ?? '') === 'unarchive') {
+        $ref    = (string)($_POST['ref'] ?? '');
+        $folder = (string)($_POST['folder'] ?? '');
+        $ok     = unarchive_order($folder, $ref);
+        $_SESSION['flash'] = $ok
+            ? ['good', $ref . ' is back in the live orders list.']
+            : ['bad', 'Could not restore ' . $ref . '.'];
+        header('Location: admin.php?code=' . urlencode(ADMIN_CODE) . '&archive=' . urlencode($folder));
+        exit;
+    }
+
     if (($_POST['do'] ?? '') === 'stock') {
         $stock = [];
         foreach (LAUNCH_STOCK as $key => $_) {
@@ -538,10 +559,7 @@ $dates  = $authed ? production_dates() : [];
   <?php if ($dates): $counts = slot_counts(); ?>
     <section class="mt-8 rounded-3xl border-2 border-ink bg-white p-6">
       <h2 class="font-display text-2xl font-bold">Windows</h2>
-      <p class="mt-1 text-sm text-cocoa">
-        Each 30-minute window takes <?= SLOT_CAPACITY ?> orders per date. When one fills, customers can no longer pick it.
-        Change the number in <span class="font-mono">config.php → SLOT_CAPACITY</span>.
-      </p>
+      
 
       <div class="mt-5 space-y-5">
         <?php foreach ($dates as $d):
@@ -583,9 +601,7 @@ $dates  = $authed ? production_dates() : [];
     <div class="flex flex-wrap items-start justify-between gap-3">
       <div>
         <h2 class="font-display text-2xl font-bold">Email alerts</h2>
-        <p class="mt-1 max-w-lg text-sm text-cocoa">
-          When an order comes in, the shop emails everyone on the list. Set this up in <span class="font-mono">config.php → NOTIFY</span>.
-        </p>
+
       </div>
       <span class="rounded-full border-2 border-ink px-3 py-1 font-mono text-[11px] uppercase tracking-widest <?= $emailReady ? 'bg-greenlt' : 'bg-gold/40' ?>">
         <?= $emailReady ? 'configured' : 'not set up' ?>
@@ -682,9 +698,110 @@ $dates  = $authed ? production_dates() : [];
               <?php endif; ?>
             </div>
           </div>
+
+          <form method="post" class="mt-4 flex items-center justify-between gap-3 border-t border-line pt-4"
+                onsubmit="return confirm('Mark <?= e($o['reference']) ?> as done? It moves to the archive, where you can still read it.');">
+            <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+            <input type="hidden" name="code" value="<?= e(ADMIN_CODE) ?>">
+            <input type="hidden" name="do" value="archive">
+            <input type="hidden" name="ref" value="<?= e($o['reference']) ?>">
+            <span class="text-xs text-cocoa">Handed over and paid? File it away.</span>
+            <button class="rounded-full border-2 border-ink bg-green px-5 py-2 text-sm font-semibold text-white hover:bg-greendk">Done</button>
+          </form>
         </details>
       <?php endforeach; ?>
     </div>
+  </section>
+
+  <!-- Archive -->
+  <?php
+  $folders     = archive_folders();
+  $openFolder  = (string)($_GET['archive'] ?? '');
+  $folderItems = $openFolder ? archived_orders($openFolder) : [];
+  ?>
+  <section class="mt-8">
+    <div class="flex flex-wrap items-baseline justify-between gap-3">
+      <h2 class="font-display text-2xl font-bold">Archive</h2>
+      <?php if ($folders): ?>
+        <p class="font-mono text-xs text-cocoa">
+          <?= count($folders) ?> folder<?= count($folders) === 1 ? '' : 's' ?> ·
+          <?= array_sum(array_column($folders, 'count')) ?> order<?= array_sum(array_column($folders, 'count')) === 1 ? '' : 's' ?>
+        </p>
+      <?php endif; ?>
+    </div>
+
+    <?php if (!$folders): ?>
+      <p class="mt-4 rounded-3xl border-2 border-dashed border-line bg-white p-10 text-center text-sm text-cocoa">
+        Nothing archived yet. Press <span class="font-semibold">Done</span> on an order and it lands here, filed by delivery date.
+      </p>
+    <?php else: ?>
+      <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <?php foreach ($folders as $f):
+          $isOpen = $openFolder === $f['folder'];
+        ?>
+          <a href="admin.php?code=<?= urlencode(ADMIN_CODE) ?><?= $isOpen ? '' : '&archive=' . urlencode($f['folder']) ?>#archive"
+             class="rounded-2xl border-2 px-5 py-4 <?= $isOpen ? 'border-ink bg-greenlt' : 'border-line bg-white hover:border-ink' ?>">
+            <span class="flex items-center gap-2">
+              <span class="text-lg">📁</span>
+              <span class="font-display text-base font-bold leading-tight"><?= e($f['label']) ?></span>
+            </span>
+            <span class="mt-1 block font-mono text-xs text-cocoa">
+              <?= $f['count'] ?> order<?= $f['count'] === 1 ? '' : 's' ?> · <?= money($f['total']) ?>
+            </span>
+          </a>
+        <?php endforeach; ?>
+      </div>
+
+      <?php if ($openFolder && $folderItems): ?>
+        <div id="archive" class="mt-5 rounded-3xl border-2 border-ink bg-white p-5">
+          <div class="flex flex-wrap items-baseline justify-between gap-2">
+            <h3 class="font-display text-xl font-bold"><?= e(pretty_date($openFolder)) ?></h3>
+            <p class="font-mono text-xs text-cocoa">storage/archive/<?= e($openFolder) ?>/</p>
+          </div>
+
+          <div class="mt-4 space-y-3">
+            <?php foreach ($folderItems as $o): ?>
+              <details class="rounded-2xl border-2 border-line p-4">
+                <summary class="flex cursor-pointer list-none flex-wrap items-center justify-between gap-3">
+                  <span>
+                    <span class="font-mono text-sm"><?= e($o['reference']) ?></span>
+                    <span class="ml-2 font-semibold"><?= e($o['customer']['name']) ?></span>
+                    <span class="block text-xs text-cocoa"><?= e($o['schedule']['slot']) ?> · <?= e($o['delivery']['label']) ?></span>
+                  </span>
+                  <span class="font-mono text-sm"><?= money($o['totals']['total']) ?></span>
+                </summary>
+
+                <div class="mt-3 border-t border-line pt-3 text-sm">
+                  <ul class="space-y-1">
+                    <?php foreach ($o['items'] as $i): ?>
+                      <li><?= (int)$i['qty'] ?>× <?= e($i['name']) ?> <span class="text-cocoa">(<?= e($i['variant']) ?>)</span></li>
+                    <?php endforeach; ?>
+                  </ul>
+                  <p class="mt-2 text-cocoa"><?= e($o['customer']['phone']) ?><?= !empty($o['packaging']['label']) ? ' · ' . e($o['packaging']['label']) : '' ?></p>
+                  <?php if (!empty($o['delivery']['address'])): ?>
+                    <p class="mt-1 text-cocoa"><?= nl2br(e($o['delivery']['address'])) ?>, <?= e($o['delivery']['city']) ?></p>
+                  <?php endif; ?>
+                  <?php if (!empty($o['payment']['proof'])): ?>
+                    <a href="<?= e($o['payment']['proof']) ?>" target="_blank" rel="noopener">
+                      <img src="<?= e($o['payment']['proof']) ?>" alt="Payment screenshot" class="mt-2 h-24 rounded-lg border-2 border-line object-cover">
+                    </a>
+                  <?php endif; ?>
+
+                  <form method="post" class="mt-3">
+                    <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+                    <input type="hidden" name="code" value="<?= e(ADMIN_CODE) ?>">
+                    <input type="hidden" name="do" value="unarchive">
+                    <input type="hidden" name="ref" value="<?= e($o['reference']) ?>">
+                    <input type="hidden" name="folder" value="<?= e($openFolder) ?>">
+                    <button class="rounded-full border-2 border-ink px-4 py-1.5 text-xs font-semibold hover:bg-greenlt">Put back in orders</button>
+                  </form>
+                </div>
+              </details>
+            <?php endforeach; ?>
+          </div>
+        </div>
+      <?php endif; ?>
+    <?php endif; ?>
   </section>
 <?php endif; ?>
 </main>

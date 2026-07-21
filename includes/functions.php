@@ -12,7 +12,7 @@ if (session_status() === PHP_SESSION_NONE) {
  * On Railway a mounted volume starts empty and hides whatever came from the repo,
  * so orders/ and proofs/ must be (re)created here or saving fails silently.
  */
-foreach ([STORAGE_DIR, PROOF_DIR] as $dir) {
+foreach ([STORAGE_DIR, PROOF_DIR, ARCHIVE_DIR] as $dir) {
     if (!is_dir($dir)) {
         @mkdir($dir, 0775, true);
     }
@@ -529,6 +529,127 @@ function all_orders(): array
     }
     $orders = [];
     foreach (glob(STORAGE_DIR . '/BTT-*.json') as $file) {
+        $data = json_decode((string)file_get_contents($file), true);
+        if ($data) {
+            $orders[] = $data;
+        }
+    }
+    usort($orders, fn($a, $b) => strcmp($b['placed_at'] ?? '', $a['placed_at'] ?? ''));
+    return $orders;
+}
+
+/* --------------------------------------------------------------- archive */
+
+/**
+ * Finished orders move out of the live list into a dated folder:
+ *
+ *     storage/archive/2026-08-07/BTT-4780B3.json
+ *
+ * They are real folders on disk, so you can also open them straight from
+ * Finder or a file manager if you ever want to.
+ */
+
+/** Which folder an order belongs in — its delivery date, falling back to the day it was placed. */
+function archive_folder_for(array $order): string
+{
+    $date = $order['schedule']['date'] ?? '';
+    if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+        return $date;
+    }
+    return substr((string)($order['placed_at'] ?? date('c')), 0, 10) ?: date('Y-m-d');
+}
+
+/** Move a live order into its archive folder. Returns the folder name, or null if it failed. */
+function archive_order(string $reference): ?string
+{
+    $order = load_order($reference);
+    if (!$order) {
+        return null;
+    }
+
+    $folder = archive_folder_for($order);
+    $dir    = ARCHIVE_DIR . '/' . $folder;
+    if (!is_dir($dir) && !@mkdir($dir, 0775, true)) {
+        return null;
+    }
+
+    // Note when it was finished, so the archive tells you more than the live list did.
+    $order['archived_at'] = date('c');
+    $written = @file_put_contents(
+        $dir . '/' . $reference . '.json',
+        json_encode($order, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
+    );
+    if ($written === false) {
+        return null;
+    }
+
+    @unlink(STORAGE_DIR . '/' . $reference . '.json');   // only after the copy is safely written
+    return $folder;
+}
+
+/** Put an archived order back in the live list. */
+function unarchive_order(string $folder, string $reference): bool
+{
+    if (!preg_match('/^BTT-[A-F0-9]{6}$/', $reference) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $folder)) {
+        return false;
+    }
+    $from = ARCHIVE_DIR . '/' . $folder . '/' . $reference . '.json';
+    if (!is_file($from)) {
+        return false;
+    }
+    $order = json_decode((string)file_get_contents($from), true);
+    if (!$order) {
+        return false;
+    }
+    unset($order['archived_at']);
+    if (!save_order($order)) {
+        return false;
+    }
+    @unlink($from);
+    return true;
+}
+
+/**
+ * Every archive folder, newest first, with how many orders and what they total.
+ *
+ * @return array<int, array{folder: string, label: string, count: int, total: float}>
+ */
+function archive_folders(): array
+{
+    if (!is_dir(ARCHIVE_DIR)) {
+        return [];
+    }
+    $folders = [];
+    foreach (glob(ARCHIVE_DIR . '/*', GLOB_ONLYDIR) as $dir) {
+        $name = basename($dir);
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $name)) {
+            continue;
+        }
+        $files = glob($dir . '/BTT-*.json') ?: [];
+        $total = 0.0;
+        foreach ($files as $file) {
+            $data   = json_decode((string)file_get_contents($file), true);
+            $total += (float)($data['totals']['total'] ?? 0);
+        }
+        $folders[] = [
+            'folder' => $name,
+            'label'  => pretty_date($name),
+            'count'  => count($files),
+            'total'  => $total,
+        ];
+    }
+    usort($folders, fn($a, $b) => strcmp($b['folder'], $a['folder']));
+    return $folders;
+}
+
+/** The orders inside one archive folder. */
+function archived_orders(string $folder): array
+{
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $folder)) {
+        return [];
+    }
+    $orders = [];
+    foreach (glob(ARCHIVE_DIR . '/' . $folder . '/BTT-*.json') ?: [] as $file) {
         $data = json_decode((string)file_get_contents($file), true);
         if ($data) {
             $orders[] = $data;

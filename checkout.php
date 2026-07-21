@@ -33,7 +33,7 @@ $dates = production_dates();
              data-availability='<?= e(json_encode(slot_availability())) ?>'
              data-capacity="<?= SLOT_CAPACITY ?>">
       <h2 class="font-display text-2xl font-bold">Pick your delivery date</h2>
-      <p class="mt-1 text-sm text-cocoa">These are the only dates we are cooking for. Times in <?= e(SHOP['timezone']) ?>.</p>
+    
 
       <?php if (!$dates): ?>
         <p class="mt-6 rounded-2xl border-2 border-jam px-5 py-4 text-sm text-jam">
@@ -61,8 +61,6 @@ $dates = production_dates();
         <?php endif; ?>
 
         <h3 class="mt-8 font-display text-lg font-bold">Pick a handover window</h3>
-        <p class="mt-1 text-sm text-cocoa" data-slot-hint>Choose a date first — we only show windows that still have room.</p>
-
         <div class="mt-3 grid gap-2 sm:grid-cols-3 lg:grid-cols-4" data-slots>
           <?php foreach (TIME_SLOTS as $slot): ?>
             <label class="cursor-pointer" data-slot-tile data-slot="<?= e($slot) ?>">

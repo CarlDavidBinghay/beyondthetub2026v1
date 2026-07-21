@@ -212,6 +212,7 @@ const NOTIFY = [
 const ADMIN_CODE = 'tub2026';
 
 const STORAGE_DIR   = __DIR__ . '/storage/orders';
+const ARCHIVE_DIR   = __DIR__ . '/storage/archive';   // finished orders, foldered by delivery date
 const PROOF_DIR     = __DIR__ . '/storage/proofs';
 const STOCK_FILE    = __DIR__ . '/storage/stock.json';
 const DATES_FILE    = __DIR__ . '/storage/production-dates.json';  // DELIVERY dates — customers pick one

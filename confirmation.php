@@ -24,7 +24,7 @@ $mine  = ($_SESSION['last_order'] ?? null) === $ref;
     <span class="mt-4 inline-block rounded-full border-2 border-ink bg-green px-4 py-1.5 font-mono text-xs uppercase tracking-widest text-white">
       <?= $isCod ? 'Order confirmed · pay on handover' : 'Payment received · we’re checking it' ?>
     </span>
-    <h1 class="mt-4 font-display text-4xl font-bold leading-tight">Salamat, <?= e($order['customer']['name']) ?>.</h1>
+    <h1 class="mt-4 font-display text-4xl font-bold leading-tight">Thank You, <?= e($order['customer']['name']) ?>.</h1>
     <p class="mx-auto mt-3 max-w-md text-cocoa">
       Your tubs are booked for <strong><?= e($order['schedule']['date_label']) ?></strong>, <?= e($order['schedule']['slot']) ?>.
       We will message you on the day.
@@ -34,7 +34,7 @@ $mine  = ($_SESSION['last_order'] ?? null) === $ref;
   <?php if ($isPickup): ?>
     <div class="mt-8 rounded-3xl border-2 border-ink bg-greenlt p-6 text-center">
       <p class="font-mono text-xs uppercase tracking-widest text-cocoa">One more step from us</p>
-      <p class="mt-2 font-display text-2xl font-bold">We’ll message you the location</p>
+      <p class="mt-2 font-display text-2xl font-bold">We will message you the location</p>
       <p class="mx-auto mt-2 max-w-sm text-sm">
         Watch <strong><?= e($order['customer']['phone']) ?></strong> — we send the exact pickup address there once your order is confirmed.
         Bring your reference number, <span class="font-mono font-semibold"><?= e($order['reference']) ?></span>.
