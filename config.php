@@ -122,7 +122,7 @@ const LAUNCH_STOCK = [
 /** Packaging the customer picks at checkout. First one is the default. */
 const PACKAGING = [
     'plastic' => ['label' => 'Plastic bag', 'note' => 'Simple and free.',                         'fee' => 0],
-    'thermal' => ['label' => 'Thermal bag', 'note' => 'Keeps it cold longer. Fits up to 2 tubs.', 'fee' => 30],
+    'thermal' => ['label' => 'Thermal bag', 'note' => 'KKeeps it chilled during transport. Fits up to 2 tubs', 'fee' => 30],
 ];
 
 const PAYMENT_METHODS = [
